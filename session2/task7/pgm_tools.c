@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     do {
         choice = -1;
         display_menu();
-        while (choice <= 1)
+        while (choice <= 0)
             choice = get_user_menu_choice("Enter choice");
 
         switch (choice) {
@@ -203,6 +203,7 @@ void free_image_array(unsigned char **image, int height) {
     for (int i = 0; i < height; i++) {
         free(image[i]);
     }
+    free(image);
 }
 
 /**
@@ -268,6 +269,7 @@ unsigned char **read_pgm_image(const char *filename, int *height, int *width, in
         }
     }
 
+    fclose(file);
     return pixels;
 }
 
@@ -380,7 +382,7 @@ unsigned char **rotate_image(unsigned char **original_image, int height, int wid
             /* 270 degree rotation algorithm */
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
-                    rotated_image[width-1-i][i] = original_image[i][j];
+                    rotated_image[width-1-j][i] = original_image[i][j];
                 }
             }
             break;
@@ -411,7 +413,7 @@ int save_pgm_image(const char *filename, unsigned char **pixels, int height, int
     }
 
     /* Write PGM header */
-    fprintf(file, "P1\n");
+    fprintf(file, "P2\n");
     fprintf(file, "%d %d\n", width, height);
     fprintf(file, "%d\n", max_gray);
 

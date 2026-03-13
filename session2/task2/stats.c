@@ -7,27 +7,37 @@
 #define MAX_SIZE 10000
 
 
-void read_data(const char* filename, float data[], int* size)
+int read_data(const char* filename, float data[], int* size)
 {
     char line[MAX_LENGTH];
     float value;
 
     *size = 0;
     FILE* infile = fopen(filename, "r");
+    if (infile == NULL) {
+        fprintf(stderr, "Error: could not open file '%s'\n", filename);
+        return 0;
+    }
 
-    if (infile != NULL) {
-        for (int i = 0; i < MAX_SIZE; ++i) {
-            if (fgets(line, MAX_LENGTH, infile) == NULL) {
-                break;
-            }
-
-            sscanf(line, "%f", &value);
-            data[i] = value;
-            (*size)++;
+    while (*size < MAX_SIZE) {
+        if (fgets(line, MAX_LENGTH, infile) == NULL) {
+            break;
         }
 
-        fclose(infile);
+        if (sscanf(line, "%f", &value) != 1) {
+            continue;
+        }
+
+        if (value < 0.0f) {
+            continue;
+        }
+
+        data[*size] = value;
+        (*size)++;
     }
+
+    fclose(infile);
+    return 1;
 }
 
 
@@ -73,7 +83,14 @@ int main(int argc, char* argv[])
     int size;
     float data[MAX_SIZE];
 
-    read_data(argv[1], data, &size);
+    if (!read_data(argv[1], data, &size)) {
+        return 1;
+    }
+
+    if (size == 0) {
+        fprintf(stderr, "Error: no valid data\n");
+        return 1;
+    }
 
     float mean = mean_value(data, size);
     float std_dev = standard_deviation(data, size, mean);

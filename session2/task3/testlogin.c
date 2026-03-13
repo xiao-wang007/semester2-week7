@@ -26,10 +26,10 @@ int main(void)
 
     #ifdef VISIBLE
       printf("Enter your password: ");
-      gets(input);
+      fgets(input, 8, stdin);
     #else
       char* tmp = getpass("Enter your password: ");
-      strcpy(input, tmp);
+      strncpy(input, tmp, 7);
     #endif
 
     /* Make sure strings are null-terminated */
